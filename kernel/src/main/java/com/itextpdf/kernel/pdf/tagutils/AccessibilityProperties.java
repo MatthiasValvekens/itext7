@@ -42,6 +42,7 @@
  */
 package com.itextpdf.kernel.pdf.tagutils;
 
+import com.itextpdf.kernel.pdf.PdfDictionary;
 import com.itextpdf.kernel.pdf.PdfName;
 import com.itextpdf.kernel.pdf.PdfString;
 import com.itextpdf.kernel.pdf.tagging.PdfNamespace;
@@ -51,6 +52,7 @@ import com.itextpdf.kernel.pdf.tagging.StandardRoles;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The accessibility properties are used to define properties of {@link PdfStructElem structure elements}
@@ -298,6 +300,50 @@ public abstract class AccessibilityProperties {
      * @return this {@link AccessibilityProperties} instance
      */
     public AccessibilityProperties addAttributes(PdfStructureAttributes attributes) {
+        return this;
+    }
+
+    /**
+     * Adds the attributes to the element. If an attribute with the same O and NS entries is already
+     * present, attempt to merge the two sets of attributes.
+     *
+     * <p>
+     * If an attribute with the same O and NS entries is present more than once already, the change
+     * will be applied to the last such entry.
+     *
+     * @param attributes the attributes to be added
+     * @param preferNew whether to preserve new or old values when a conflict arises during merging
+     *
+     * @return this {@link AccessibilityProperties} instance
+     */
+    public AccessibilityProperties addOrMergeAttributes(PdfStructureAttributes attributes, boolean preferNew) {
+        if (attributes == null) {
+            return this;
+        }
+        // Note: on backed attrs, this doesn't increment the attribute revision numbers.
+        // But nobody really cares about revision numbers, and this method's chief consumer is in the layout
+        // engine, where the distinction doesn't really matter.
+        PdfDictionary newAttrsDict = attributes.getPdfObject();
+        List<PdfStructureAttributes> attributesList = this.getAttributesList();
+        for (int i = attributesList.size() - 1; i >= 0; i--) {
+            PdfStructureAttributes existingAttrs = attributesList.get(i);
+            PdfDictionary existingDict = existingAttrs.getPdfObject();
+            if (Objects.equals(existingDict.getAsName(PdfName.O), newAttrsDict.getAsName(PdfName.O))
+                    && Objects.equals(existingDict.getAsName(PdfName.NS), newAttrsDict.getAsName(PdfName.NS))) {
+                existingAttrs.mergeAttributesFrom(attributes, preferNew);
+                return this;
+            }
+        }
+        // if we got here, we need to add the attrs the usual way
+        // The location doesn't strictly matter, but we use preferNew to decide whether to put them at the front
+        // or at the back, to preserve compatibility with past behaviour for addAttributes(...)
+        // and addAttributes(0, ...), which would semantically have the same effect as calling this function with
+        // preferNew = true and preferNew = false, respectively.
+        if (preferNew) {
+            addAttributes(attributes);
+        } else {
+            addAttributes(0, attributes);
+        }
         return this;
     }
 

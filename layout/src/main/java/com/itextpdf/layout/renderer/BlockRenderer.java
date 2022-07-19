@@ -500,9 +500,9 @@ public abstract class BlockRenderer extends AbstractRenderer {
                 TagTreePointer tagPointer = taggingHelper.useAutoTaggingPointerAndRememberItsPosition(this);
                 if (taggingHelper.createTag(this, tagPointer)) {
                     tagPointer.getProperties()
-                            .addAttributes(0, AccessibleAttributesApplier.getListAttributes(this, tagPointer))
-                            .addAttributes(0, AccessibleAttributesApplier.getTableAttributes(this, tagPointer))
-                            .addAttributes(0, AccessibleAttributesApplier.getLayoutAttributes(this, tagPointer));
+                            .addOrMergeAttributes(AccessibleAttributesApplier.getListAttributes(this, tagPointer), false)
+                            .addOrMergeAttributes(AccessibleAttributesApplier.getTableAttributes(this, tagPointer), false)
+                            .addOrMergeAttributes(AccessibleAttributesApplier.getLayoutAttributes(this, tagPointer), false);
                 }
             }
         }

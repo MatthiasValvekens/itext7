@@ -126,6 +126,22 @@ public class PdfStructureAttributes extends PdfObjectWrapper<PdfDictionary> {
         return this;
     }
 
+    public PdfStructureAttributes mergeAttributesFrom(PdfStructureAttributes other, boolean preferNew) {
+        PdfDictionary kValPairs = this.getPdfObject();
+        PdfDictionary newKValPairs = other.getPdfObject();
+        for (PdfName key : newKValPairs.keySet()) {
+            // if the key is not present already, or the caller specified to override old values,
+            // replace the key
+            // (note: we also skip O and NS)
+            boolean specialKey = PdfName.Type.equals(key) || PdfName.O.equals(key) || PdfName.NS.equals(key);
+            if (!specialKey && (preferNew || !kValPairs.containsKey(key))) {
+                kValPairs.put(key, newKValPairs.get(key));
+                this.setModified();
+            }
+        }
+        return this;
+    }
+
     @Override
     protected boolean isWrappedObjectMustBeIndirect() {
         return false;

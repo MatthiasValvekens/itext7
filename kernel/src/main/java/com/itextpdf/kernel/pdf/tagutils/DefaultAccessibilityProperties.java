@@ -43,6 +43,8 @@
  */
 package com.itextpdf.kernel.pdf.tagutils;
 
+import com.itextpdf.kernel.pdf.PdfDictionary;
+import com.itextpdf.kernel.pdf.PdfName;
 import com.itextpdf.kernel.pdf.tagging.PdfNamespace;
 import com.itextpdf.kernel.pdf.tagging.PdfStructElem;
 import com.itextpdf.kernel.pdf.tagging.PdfStructureAttributes;
@@ -50,6 +52,7 @@ import com.itextpdf.kernel.pdf.tagging.PdfStructureAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The class represents a basic implementation of {@link AccessibilityProperties} that preserves specified
