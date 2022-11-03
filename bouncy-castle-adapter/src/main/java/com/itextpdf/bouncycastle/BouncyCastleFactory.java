@@ -1155,7 +1155,9 @@ public class BouncyCastleFactory implements IBouncyCastleFactory {
 
     @Override
     public IJcaPEMKeyConverter createJcaPEMKeyConverter() {
-        return new JcaPEMKeyConverterBC(new JcaPEMKeyConverter());
+        JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+        converter.setProvider(PROVIDER);
+        return new JcaPEMKeyConverterBC(converter);
     }
 
     @Override
